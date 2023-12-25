@@ -38,6 +38,10 @@ public class ResultVO<T> {
         this.data = null;
     }
 
+    public static <T> ResultVO<T> success(){
+        return new ResultVO<>(ResultCodeEnum.SUCCESS,null);
+    }
+
     public static <T> ResultVO<T> success(T data){
         return new ResultVO<>(ResultCodeEnum.SUCCESS,data);
     }

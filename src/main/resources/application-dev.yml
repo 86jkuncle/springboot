@@ -8,15 +8,39 @@ server:
   tomcat:
     uri-encoding: utf-8
   max-http-header-size: 80KB
+
 ############################################################
 #
-# 配置thymeleaf
+# 配置shiro https://alexxiyang.github.io/shiro-redis/#configurable-options
+#
+############################################################
+shiro:
+  enabled: true
+  web:
+    enabled: true
+  annotations:
+    enabled: true
+  sessionManager:
+    deleteInvalidSessions: true
+    sessionIdCookieEnabled: true
+    sessionIdUrlRewritingEnabled: true
+  userNativeSessionManager: false
+  loginUrl: /login
+  successUrl: /index
+  unauthorizedUrl: /403
+
+############################################################
+#
+# 配置thymeleaf https://docs.spring.io/spring-boot/docs/2.7.18/reference/htmlsingle/
 #
 ############################################################
 spring:
   thymeleaf:
     cache: false
-############################################################
+    mode: HTML
+    prefix: classpath:/templates/
+    suffix: .html
+  ############################################################
 #
 # 配置数据源信息
 #
@@ -38,7 +62,7 @@ spring:
       connection-test-query: SELECT 1
 ############################################################
 #
-# mybatis-plus 配置
+# mybatis-plus 配置 https://baomidou.com/pages/56bac0/#%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE
 #
 ############################################################
 mybatis-plus:
@@ -65,3 +89,5 @@ ms:
     address: redis://127.0.0.1:6379
     database: 0
     password: foobared
+    host: 127.0.0.1:6379
+

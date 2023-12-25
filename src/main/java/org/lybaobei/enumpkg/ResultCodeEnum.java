@@ -5,7 +5,9 @@ public enum ResultCodeEnum {
 
     BAD_REQUEST(400,"服务器不理解客户端的请求，未做任何处理"),
     UNAUTHORIZED(401,"用户未提供身份验证凭据"),
+    LOCKEDACCOUNT(400,"账户已被锁定"),
 
+    AUTHENTICATIONFAIL(400,"认证失败"),
     FORBIDDEN(403,"不具有访问资源所需的权限"),
 
     NOT_FOUND(404,"所请求的资源不存在，或不可用"),

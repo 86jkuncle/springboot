@@ -24,9 +24,9 @@ spring:
   datasource: # 数据源的相关配置
     type: com.zaxxer.hikari.HikariDataSource # 数据源类型：HikariCP
     driver-class-name: com.mysql.jdbc.Driver # mysql驱动
-    url: jdbc:mysql://localhost:3306/ms?useUnicode=true&characterEncoding=UTF-8&autoReconnect&useSSL=false
+    url: jdbc:mysql://localhost:3306/hntt?useUnicode=true&characterEncoding=UTF-8&autoReconnect&useSSL=false
     username: root
-    password: 123456
+    password: root
     hikari:
       connection-timeout: 30000 # 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQ
       minimum-idle: 5 # 最小连接数
@@ -42,8 +42,10 @@ spring:
 #
 ############################################################
 mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
 
 # 分页插件配置
 #  mybatis-plus.configuration.plugins=
@@ -64,4 +66,4 @@ ms:
   redisConfig:
     address: redis://127.0.0.1:6379
     database: 0
-    password: foobared
+    password: 123456

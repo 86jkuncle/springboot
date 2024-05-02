@@ -2,10 +2,8 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.lybaobei.mapper.UserMapper">
-    <resultMap id="userResultMap" type="org.lybaobei.entity.Users">
-        <id column="id" property="id"/>
-        <result column="name" property="name"/>
+<mapper namespace="org.lybaobei.mapper.SysRoleMapper">
+    <resultMap id="sysRoleResultMap" type="org.lybaobei.entity.SystemRole" autoMapping="true">
         <!-- 其他字段 -->
     </resultMap>
 

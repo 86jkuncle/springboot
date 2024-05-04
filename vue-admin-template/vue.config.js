@@ -38,11 +38,11 @@ module.exports = {
     },
     // before: require('./mock/mock-server.js')
     proxy:{
-      '/system-biz':{ //匹配所有以system-biz开头的请求路径
-        target:'http://localhost:28085',
+      '/dev-api':{ //匹配所有以system-biz开头的请求路径
+        target:'http://localhost:8088',
         changeOrigin:true, //支持跨域
         pathRewrite:{ //重写路径,去掉路径中开头的 /system-biz
-          '^/system-biz':''
+          '^/dev-api':''
         }
       }
     }

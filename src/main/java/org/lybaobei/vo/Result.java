@@ -2,7 +2,7 @@ package org.lybaobei.vo;
 
 import org.lybaobei.enumpkg.ResultCodeEnum;
 
-public class ResultVO<T> {
+public class Result<T> {
     private final int status;
     private final String message;
 
@@ -20,38 +20,42 @@ public class ResultVO<T> {
         return data;
     }
 
-    private ResultVO(int status, String message) {
+    private Result(int status, String message) {
         this.status = status;
         this.message = message;
         this.data = null;
     }
 
-    private ResultVO(ResultCodeEnum resultCodeEnum, T data) {
+    private Result(ResultCodeEnum resultCodeEnum, T data) {
         this.status = resultCodeEnum.getStatus();
         this.message = resultCodeEnum.getMessage();
         this.data = data;
     }
 
-    private ResultVO(ResultCodeEnum resultCodeEnum){
+    private Result(ResultCodeEnum resultCodeEnum){
         this.status = resultCodeEnum.getStatus();
         this.message = resultCodeEnum.getMessage();
         this.data = null;
     }
-
-    public static <T> ResultVO<T> success(T data){
-        return new ResultVO<>(ResultCodeEnum.SUCCESS,data);
+    
+    public static <T> Result<T> success(){
+        return new Result<>(ResultCodeEnum.SUCCESS,null);
     }
 
-    public static ResultVO fail(ResultCodeEnum resultCodeEnum){
-        return new ResultVO<>(resultCodeEnum);
+    public static <T> Result<T> success(T data){
+        return new Result<>(ResultCodeEnum.SUCCESS,data);
     }
 
-    public static  ResultVO fail(){
-        return new ResultVO<>(ResultCodeEnum.UNKNOWN_ERROR);
+    public static Result fail(ResultCodeEnum resultCodeEnum){
+        return new Result<>(resultCodeEnum);
     }
 
-    public static  ResultVO fail(int status,String message){
-        return new ResultVO<>(status,message);
+    public static Result fail(){
+        return new Result<>(ResultCodeEnum.UNKNOWN_ERROR);
+    }
+
+    public static Result fail(int status, String message){
+        return new Result<>(status,message);
     }
 
 }

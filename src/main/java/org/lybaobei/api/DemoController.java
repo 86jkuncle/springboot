@@ -4,7 +4,7 @@ import java.util.List;
 import org.lybaobei.entity.SystemRole;
 import org.lybaobei.service.RedisOperator;
 import org.lybaobei.service.SysRoleServices;
-import org.lybaobei.vo.ResultVO;
+import org.lybaobei.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,19 +32,19 @@ public class DemoController {
     }
 
     @GetMapping("users")
-    public ResultVO<List<SystemRole>> getUsers(){
-        return ResultVO.fail();
+    public Result<List<SystemRole>> getUsers(){
+        return Result.fail();
     }
 
     @GetMapping("setredis")
-    public ResultVO<String> set(String key,String value){
+    public Result<String> set(String key, String value){
         redisOperator.set(key, value);
-        return ResultVO.success("OK");
+        return Result.success("OK");
     }
 
     @GetMapping("getredis")
-    public ResultVO<String> get(String key){
+    public Result<String> get(String key){
         String s = redisOperator.get(key);
-        return ResultVO.success(s);
+        return Result.success(s);
     }
 }

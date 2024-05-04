@@ -1,16 +1,16 @@
 <template>
   <div class="app-container">
-    角色列表
+    机构列表
 
     <div class="search-div">
       <el-form label-width="70px" size="small">
         <el-row>
           <el-col :span="24">
-            <el-form-item label="角色名称">
+            <el-form-item label="机构名称">
               <el-input
                 style="width: 100%"
-                v-model="roleName"
-                placeholder="角色名称"
+                v-model="orgName"
+                placeholder="机构名称"
               ></el-input>
             </el-form-item>
           </el-col>
@@ -40,40 +40,34 @@
     <el-table
       v-loading="listLoading"
       :data="list"
+      style="width: 100%; margin-top: 10px"
+      row-key="orgId"
       stripe
       border
-      style="width: 100%; margin-top: 10px"
+      :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     >
       <el-table-column label="序号" width="70" align="center">
         <template slot-scope="scope">
           {{ (page - 1) * limit + scope.$index + 1 }}
         </template>
       </el-table-column>
-
-      <el-table-column prop="roleName" label="角色名称" />
-      <el-table-column prop="roleCode" label="角色编码" />
-      <el-table-column prop="roleDesc" label="角色描述" />
-      <el-table-column prop="createTime" label="创建时间" />
+      <el-table-column prop="orgName" label="机构名称" sortable>
+      </el-table-column>
+      <el-table-column prop="createTime" label="创建时间" sortable>
+      </el-table-column>
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
           <el-button
             type="primary"
             icon="el-icon-edit"
             size="mini"
-            @click="editRole(scope.row.roleId)"
+            @click="editOrg(scope.row.orgId)"
           ></el-button>
           <el-button
             type="danger"
             icon="el-icon-delete"
             size="mini"
-            @click="delRole(scope.row.roleId)"
-          ></el-button>
-          <el-button
-            type="warning"
-            icon="el-icon-baseball"
-            size="mini"
-            @click="showAssignAuth(scope.row)"
-            title="分配权限"
+            @click="delOrg(scope.row)"
           ></el-button>
         </template>
       </el-table-column>
@@ -93,25 +87,33 @@
     <el-dialog title="添加/修改" :visible.sync="dialogVisible" width="40%">
       <el-form
         ref="dataForm"
-        :model="sysRole"
+        :model="sysOrg"
         label-width="150px"
         size="small"
         style="padding-right: 40px"
       >
-        <el-form-item label="角色名称">
-          <el-input v-model="sysRole.roleName" />
+        <el-form-item label="机构名称">
+          <el-input v-model="sysOrg.orgName" />
         </el-form-item>
 
-        <el-form-item label="角色编码">
-          <el-input v-model="sysRole.roleCode" />
+        <el-form-item label="所属机构">
+          <el-select v-model="sysOrg.parentId" filterable placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.orgId"
+              :label="item.orgName"
+              :value="item.orgId"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
 
         <el-form-item label="排序">
-          <el-input v-model="sysRole.seq" />
+          <el-input v-model="sysOrg.seq" />
         </el-form-item>
 
-        <el-form-item label="角色描述">
-          <el-input v-model="sysRole.roleDesc" />
+        <el-form-item label="机构描述">
+          <el-input v-model="sysOrg.orgDesc" />
         </el-form-item>
       </el-form>
 
@@ -129,84 +131,89 @@
     </el-dialog>
   </div>
 </template>
-
-<script>
-import {
-  getList,
-  add,
-  getById,
-  update,
-  del
-} from "@/api/role";
+  
+  <script>
+import { getList, getParentList, add, getById, update, del } from "@/api/org";
 export default {
   data() {
     return {
       listLoading: true,
       list: [],
-      roleName: "",
       total: 0,
       page: 1,
-      limit: 3,
-      currentPage:1,
-      sysRole:{},
-      dialogVisible:false
+      limit: 10,
+      currentPage: 1,
+      orgName: "",
+      options: [
+        {
+          orgId: 0,
+          orgName: "顶层机构",
+        },
+      ],
+      value: "",
+      sysOrg: {},
+      dialogVisible: false,
     };
   },
   created() {
     this.fetchData();
   },
+
   methods: {
-    showAssignAuth(row){
-      this.$router.push({path:`/system/assignAuth?roleId=${row.roleId}&roleName=${row.roleName}`});
+    search(){
+        this.fetchData();
+    },
+    handleSizeChange(val) {
+      this.limit = val;
+      this.fetchData();
+    },
+    handleCurrentChange(val) {
+      this.fetchData(val);
     },
     saveOrUpdate() {
-      if (!this.sysRole.roleId) {
-        this.saveRole();
+      if (!this.sysOrg.orgId) {
+        this.saveOrg();
       } else {
-        this.updateRole();
+        this.updateOrg();
       }
     },
-    saveRole() {
-      add(this.sysRole).then((res) => {
+    updateOrg() {
+      update(this.sysOrg).then((res) => {
         if (res.status === 200) {
           this.dialogVisible = false;
           this.fetchData();
           this.$message({
-            message: "添加角色成功",
+            message: "修改机构成功",
             type: "success",
           });
         }
       });
     },
-    updateRole() {
-      update(this.sysRole).then((res) => {
+    saveOrg() {
+      add(this.sysOrg).then((res) => {
         if (res.status === 200) {
           this.dialogVisible = false;
           this.fetchData();
           this.$message({
-            message: "修改角色成功",
+            message: "添加机构成功",
             type: "success",
           });
         }
       });
     },
-    add() {
-      this.sysRole = {};
-      this.dialogVisible = true;
-    },
-    editRole(id) {
-      getById(id).then((res) => {
-        this.sysRole = res.data;
-        this.dialogVisible = true;
-      });
-    },
-    delRole(id) {
+    delOrg(row) {
+      if (row.children) {
+        return this.$message({
+          type: "error",
+          message: "该机构下有子节点,无法删除",
+        });
+      }
       this.$confirm("确定要删除吗?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        del(id).then((res) => {
+        del(row.orgId).then((res) => {
           if (res.status === 200) {
             this.fetchData();
             this.$message({
@@ -217,22 +224,38 @@ export default {
         });
       });
     },
-    resetData(){
-        this.roleName = ''
+    editOrg(id) {
+      this.options = [
+        {
+          orgId: 0,
+          orgName: "顶层机构",
+        },
+      ];
+      getById(id).then((res) => {
+        this.sysOrg = res.data;
+        getParentList().then((resp) => {
+          if (resp.data.length) {
+            this.options.push(...resp.data);
+           
+            this.dialogVisible = true;
+          }
+        });
+      });
     },
-    search() {
-      this.fetchData();
+    add() {
+      this.sysOrg = {};
+      getParentList().then((res) => {
+        if (res.data.length) {
+          this.options.push(...res.data);
+        }
+      });
+      this.dialogVisible = true;
     },
-    handleSizeChange(val) {
-      this.limit = val;
-      this.fetchData();
-    },
-    handleCurrentChange(val) {
-      this.fetchData(val);
-    },
+    resetData() {this.orgName = ''},
     fetchData(pageNum = 1) {
+
       this.page = pageNum;
-      getList({ page: this.page, limit: this.limit, roleName: this.roleName })
+      getList({ page: this.page, limit: this.limit, orgName: this.orgName })
         .then((res) => {
           if (res.status === 200) {
             this.listLoading = false;
@@ -246,6 +269,7 @@ export default {
   },
 };
 </script>
+  
+  <style>
 
-<style>
 </style>

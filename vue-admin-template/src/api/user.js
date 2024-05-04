@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import Cookies from 'js-cookie';
 
 const base = "/admin/system/user";
 
@@ -19,8 +20,9 @@ export function getInfo(token) {
 }
 
 export function logout() {
-  return request({
-    url: base+'/logout',
-    method: 'post'
-  })
+ 
+  // return request({
+  //   url: base+'/logout',
+  //   method: 'post'
+  // })
 }

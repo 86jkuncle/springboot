@@ -5,21 +5,21 @@ import lombok.Data;
 import org.lybaobei.common.Constants;
 
 import java.util.Date;
+import java.util.List;
 
-@TableName("system_role")
+/**
+ * @author nommpp
+ * @date 2024/5/3 0003
+ */
+@TableName("system_org")
 @Data
-public class SystemRole {
+public class SystemOrg {
     @TableId(type = IdType.AUTO)
-    private Integer roleId;
-
-    private String roleName;
-    
-    private String roleCode;
-    
-    private Integer roleStatus = Constants.RoleStatus.NORMAL;
-    
+    private Integer orgId;
+    private Integer parentId;
+    private String orgName;
+    private Integer orgStatus = Constants.OrgStatus.NORMAL;
     private Integer seq;
-    
     @TableField(fill = FieldFill.INSERT)
     private String createUserId;
     @TableField(fill = FieldFill.INSERT)
@@ -28,5 +28,12 @@ public class SystemRole {
     private String updateUserId;
     @TableField(fill = FieldFill.UPDATE)
     private Date updateTime;
-    private String roleDesc;
+    private String orgDesc;
+    
+    @TableField(exist = false)
+    private List<SystemOrg> children;
+    
+    @TableField(exist = false)
+    private Boolean isSelected;
+    
 }

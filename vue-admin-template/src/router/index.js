@@ -5,6 +5,8 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
+import { compile } from 'path-to-regexp'
+import { title } from '@/settings'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -79,9 +81,25 @@ export const constantRoutes = [
         name: 'SysMenu',
         component: () => import('@/views/system/sysmenu'),
         meta: { title: '菜单管理', icon: 'tree' }
-      }
+      },
+      {
+        path: 'sysOrg',
+        name: 'SysOrg',
+        component: () => import('@/views/system/sysorg'),
+        meta: { title: '机构管理', icon: 'tree' }
+      },
+      {
+        path:'assignAuth',
+        component: () => import('@/views/system/sysrole/assignAuth'),
+        meta:{
+          activeMenu:'/system/sysRole',
+          title:'角色授权'
+        },
+        hidden:true,
+      },
     ]
   },
+  
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

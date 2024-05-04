@@ -1,6 +1,6 @@
 import request from '@/utils/request';
 
-const base = "/admin/system/sysrole";
+const base = "/admin/system/sysuser";
 
 export function getList(params){
     return request({
@@ -20,7 +20,7 @@ export function add(params){
 
 export function getById(id){
     return request({
-        url:`${base}/findByRoleId/${id}`,
+        url:`${base}/findByUserId/${id}`,
         method:'get'
     });
 }
@@ -40,18 +40,9 @@ export function del(id){
     });
 }
 
-export function getRolesByUserId(userId){
+export function userStatus(id,status){
     return request({
-        url:`${base}/toAssign/${userId}`,
-        method: 'get'
+        url:`${base}/status/${id}/${status}`,
+        method:'get'
     });
 }
-
-export function assignRoles(params){
-    return request({
-        url:`${base}/doAssign`,
-        method: 'post',
-        data:params
-    });
-}
-

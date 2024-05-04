@@ -9,4 +9,25 @@ public class Constants {
         static final int HALF_AN_HOUR=1800;
         static final int MINUTE=60;
     }
+    
+    public interface UserStatus {
+        static final int NORMAL = 1;
+        static final int LOCKED = 2;
+        static final int INVALID = 3;
+    }
+    
+    public interface OrgStatus {
+        static final int NORMAL = 1;
+        static final int INVALID = 2;
+    }
+    
+    public interface RoleStatus {
+        static final int NORMAL = 1;
+        static final int INVALID = 2;
+    }
+    
+    public interface MenuStatus {
+        static final int NORMAL = 1;
+        static final int INVALID = 2;
+    }
 }

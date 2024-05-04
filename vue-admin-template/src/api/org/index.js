@@ -1,10 +1,25 @@
 import request from '@/utils/request';
 
-const base = "/admin/system/sysrole";
+const base = "/admin/system/sysorg";
+
+export function getAllList(){
+    return request({
+        url: `${base}/listAll`,
+        method:'get'
+    });
+}
 
 export function getList(params){
     return request({
-        url:`${base}/list`,
+        url: `${base}/list`,
+        method:'get',
+        params
+    });
+}
+
+export function getParentList(params){
+    return request({
+        url:base+'/listParent',
         method:'get',
         params
     });
@@ -20,7 +35,7 @@ export function add(params){
 
 export function getById(id){
     return request({
-        url:`${base}/findByRoleId/${id}`,
+        url:`${base}/findByOrgId/${id}`,
         method:'get'
     });
 }
@@ -39,19 +54,3 @@ export function del(id){
         method:'delete'
     });
 }
-
-export function getRolesByUserId(userId){
-    return request({
-        url:`${base}/toAssign/${userId}`,
-        method: 'get'
-    });
-}
-
-export function assignRoles(params){
-    return request({
-        url:`${base}/doAssign`,
-        method: 'post',
-        data:params
-    });
-}
-

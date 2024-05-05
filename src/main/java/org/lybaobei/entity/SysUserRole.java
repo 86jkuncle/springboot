@@ -12,7 +12,7 @@ import java.util.Date;
 @TableName("system_user_role")
 @Data
 public class SysUserRole {
-   
+
     private String userId;
 
     private Integer roleId;

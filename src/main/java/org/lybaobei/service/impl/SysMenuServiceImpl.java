@@ -14,10 +14,13 @@ import org.lybaobei.exception.APIException;
 import org.lybaobei.mapper.SysMenuMapper;
 import org.lybaobei.mapper.SysRoleMenuMapper;
 import org.lybaobei.service.SysMenuService;
+import org.lybaobei.utils.RouterUtil;
 import org.lybaobei.utils.TreeUtil;
+import org.lybaobei.vo.RouterVO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -115,5 +118,38 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SystemMenu>
             sysRoleMenu.setMenuId(item);
             sysRoleMenuMapper.insert(sysRoleMenu);
         });
+    }
+    
+    @Override
+    public List<RouterVO> getUserMenuByUserId(String userId) {
+        List<SystemMenu> systemMenus = new ArrayList<>();
+        if("7ee51a6e91dd4ac38a100b182dcf4d59".equals(userId)){
+            QueryWrapper<SystemMenu> wrapper = new QueryWrapper<>();
+            wrapper.eq("menu_status",Constants.MenuStatus.NORMAL);
+            systemMenus = baseMapper.selectList(wrapper);
+        }else{
+            systemMenus = baseMapper.findMenuListByUserId(userId);
+        }
+        
+        List<SystemMenu> menuTreeList = TreeUtil.buildMenuTree(systemMenus);
+        
+        List<RouterVO> routerList = RouterUtil.buildRouters(menuTreeList);
+        return routerList;
+    }
+    
+    @Override
+    public List<String> getUserButtonPermsList(String userId) {
+        List<SystemMenu> systemMenus = new ArrayList<>();
+        if("7ee51a6e91dd4ac38a100b182dcf4d59".equals(userId)){
+            QueryWrapper<SystemMenu> wrapper = new QueryWrapper<>();
+            wrapper.eq("menu_status",Constants.MenuStatus.NORMAL);
+            systemMenus = baseMapper.selectList(wrapper);
+        }else{
+            systemMenus = baseMapper.findMenuListByUserId(userId);
+        }
+    
+        List<String> buttons = systemMenus.stream().filter(systemMenu -> systemMenu.getPerms() != null)
+                .map(SystemMenu::getPerms).collect(Collectors.toList());
+        return buttons;
     }
 }

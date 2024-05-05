@@ -22,6 +22,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public Result error(Exception e){
+        e.printStackTrace();
         return Result.fail();
     }
 

@@ -24,6 +24,7 @@ public class SystemUser {
     private Integer type;
     private String phone;
     private String pwd;
+    private String salt;
     private Integer userStatus = Constants.UserStatus.NORMAL;
     private Integer lockCnt;
     @TableField(fill = FieldFill.INSERT)

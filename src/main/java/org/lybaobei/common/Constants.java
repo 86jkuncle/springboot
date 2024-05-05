@@ -30,4 +30,10 @@ public class Constants {
         static final int NORMAL = 1;
         static final int INVALID = 2;
     }
+    
+    public interface MenuType {
+        static final int DIRECTOR = 1;
+        static final int MENUED = 2;
+        static final int BUTTONS = 3;
+    }
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.lybaobei.dto.AssginMenuDTO;
 import org.lybaobei.dto.PageDTO;
 import org.lybaobei.entity.SystemMenu;
+import org.lybaobei.vo.RouterVO;
 
 import java.util.List;
 
@@ -24,4 +25,8 @@ public interface SysMenuService extends IService<SystemMenu> {
     List<SystemMenu> findMenuByRoleId(Integer roleId);
     
     void doAssign(AssginMenuDTO assginMenuDTO);
+    
+    List<RouterVO> getUserMenuByUserId(String userId);
+    
+    List<String> getUserButtonPermsList(String userId);
 }

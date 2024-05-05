@@ -76,6 +76,13 @@ ms:
     address: redis://127.0.0.1:6379
     database: 0
     password: 123456
+###############################################################
+knife4j:
+  enable: true
+  production: true
+  setting:
+    # 开启动态请求参数，true-开启，false-关闭
+    enableDynamicParameter: true
 
 
 

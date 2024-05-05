@@ -8,6 +8,12 @@ public class APIException extends RuntimeException{
     public int getStatus() {
         return status;
     }
+    
+    public APIException(String message){
+        super(message);
+        this.status = 400;
+        
+    }
 
     public APIException(int status, String message){
         super(message);

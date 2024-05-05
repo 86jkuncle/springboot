@@ -7,6 +7,7 @@ import org.lybaobei.entity.SystemUser;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author nommpp
@@ -22,4 +23,8 @@ public interface SysUserService extends IService<SystemUser> {
     void removeUserById(String userId);
     
     void changeUserStatus(String userId, Integer status);
+    
+    SystemUser getByName(String userName);
+    
+    Map<String,Object> getUserInfo(String userId);
 }

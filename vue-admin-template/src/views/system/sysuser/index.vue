@@ -8,20 +8,20 @@
           <el-col :span="24" style="display: flex">
             <el-form-item label="用户名称">
               <el-input
-                v-model="sysUser.userName"
+                v-model="search.userName"
                 placeholder="用户名称"
               ></el-input>
             </el-form-item>
 
             <el-form-item label="用户手机">
               <el-input
-                v-model="sysUser.phone"
+                v-model="search.phone"
                 placeholder="用户名称"
               ></el-input>
             </el-form-item>
 
             <el-form-item label="用户类型">
-              <el-select v-model="sysUser.type" filterable placeholder="请选择">
+              <el-select v-model="search.type" filterable placeholder="请选择">
                 <el-option
                   v-for="item in typeArr"
                   :key="item.value"
@@ -34,7 +34,7 @@
 
             <el-form-item label="所属机构">
               <el-select
-                v-model="sysUser.orgId"
+                v-model="search.orgId"
                 filterable
                 placeholder="请选择"
               >
@@ -155,6 +155,10 @@
           <el-input v-model="sysUser.phone" />
         </el-form-item>
 
+        <el-form-item label="用户密码">
+          <el-input v-model="sysUser.pwd" />
+        </el-form-item>
+
         <el-form-item label="所属机构">
           <el-select v-model="sysUser.orgId" filterable placeholder="请选择">
             <el-option
@@ -256,6 +260,7 @@ export default {
         { value: 2, label: "管理人员" },
         { value: 3, label: "普通用户" },
       ],
+      search:{},
       options: [],
       listLoading: true,
       dialogVisible: false,
@@ -387,7 +392,7 @@ export default {
       });
     },
     resetData() {
-      this.sysUser = {};
+      this.search = {};
     },
     allOrg() {
       getAllList().then((res) => {
@@ -413,14 +418,15 @@ export default {
       });
     },
     fetchData(pageNum = 1) {
+      this.search = {}
       this.page = pageNum;
       getList({
         page: this.page,
         limit: this.limit,
-        orgId: this.sysUser.orgId,
-        phone: this.sysUser.phone,
-        userName: this.sysUser.userName,
-        type: this.sysUser.type,
+        orgId: this.search.orgId,
+        phone: this.search.phone,
+        userName: this.search.userName,
+        type: this.search.type,
       })
         .then((res) => {
           if (res.status === 200) {

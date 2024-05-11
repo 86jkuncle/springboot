@@ -16,6 +16,8 @@ import org.lybaobei.service.SysMenuService;
 import org.lybaobei.service.SysUserService;
 import org.lybaobei.utils.SecUtil;
 import org.lybaobei.vo.RouterVO;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -107,5 +109,27 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SystemUser>
         resultMap.put("buttons",permsList);
         
         return resultMap;
+    }
+
+    @Override
+    public void incrementLockCnt(String userName) {
+        SystemUser user = getByName(userName);
+        if (user != null) {
+            if(user.getLockCnt() == Constants.UserStatus.LOCKCNT){
+                throw new LockedException("用户账号已被锁定，请联系管理员解锁");
+            }
+
+            user.setLockCnt(user.getLockCnt() + 1);
+            updateById(user);
+        }else{
+            throw new UsernameNotFoundException("用户名或密码错误");
+        }
+    }
+
+    @Override
+    public void resetLockCnt(String userName) {
+        SystemUser user = getByName(userName);
+        user.setLockCnt(0);
+        updateById(user);
     }
 }

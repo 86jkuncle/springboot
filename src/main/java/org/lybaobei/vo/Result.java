@@ -46,9 +46,14 @@ public class Result<T> {
         return new Result<>(ResultCodeEnum.SUCCESS,data);
     }
 
+    public static Result success(ResultCodeEnum resultCodeEnum){
+        return new Result<>(resultCodeEnum);
+    }
+
     public static Result fail(ResultCodeEnum resultCodeEnum){
         return new Result<>(resultCodeEnum);
     }
+
 
     public static Result fail(){
         return new Result<>(ResultCodeEnum.UNKNOWN_ERROR);

@@ -29,13 +29,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private static final Set<String> allUrls =
-            Collections.unmodifiableSet(Sets.newHashSet("/admin/system/user/login","/swagger-resources","/favicon.ico","/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/doc.html"));
+            Collections.unmodifiableSet(Sets.newHashSet("/admin/system/user/logout","/admin/system/user/login","/swagger-resources","/favicon.ico","/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/doc.html"));
 
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    
-        if(allUrls.contains(request.getRequestURI())
+         if(allUrls.contains(request.getRequestURI())
             || request.getRequestURI().startsWith("/v2")
             || request.getRequestURI().startsWith("/swagger-resources")){
             filterChain.doFilter(request,response);

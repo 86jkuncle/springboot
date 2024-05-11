@@ -1,10 +1,12 @@
 package org.lybaobei.custom;
 
+import java.util.Collections;
 import org.lybaobei.entity.SystemUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.Collection;
+import org.springframework.util.Assert;
 
 /**
  * @author nommpp
@@ -15,8 +17,8 @@ public class CusotmUser extends User {
     private SystemUser systemUser;
 
 
-    public CusotmUser(SystemUser systemUser, Collection<? extends GrantedAuthority> authorities) {
-        super(systemUser.getUserName(), systemUser.getPwd(), authorities);
+    public CusotmUser(SystemUser systemUser, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+        super(systemUser.getUserName(),systemUser.getPwd(),enabled,accountNonExpired,credentialsNonExpired,accountNonLocked,authorities);
         this.systemUser = systemUser;
     }
 

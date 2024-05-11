@@ -14,6 +14,8 @@ public class Constants {
         static final int NORMAL = 1;
         static final int LOCKED = 2;
         static final int INVALID = 3;
+
+        static final int LOCKCNT = 3;
     }
     
     public interface OrgStatus {

@@ -35,7 +35,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver # mysql驱动
     url: jdbc:mysql://localhost:3306/hntt?useUnicode=true&characterEncoding=UTF-8&autoReconnect&useSSL=false
     username: root
-    password: root
+    password: 123456
     hikari:
       connection-timeout: 30000 # 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQ
       minimum-idle: 5 # 最小连接数
@@ -75,11 +75,11 @@ ms:
   redisConfig:
     address: redis://127.0.0.1:6379
     database: 0
-    password: 123456
+    password: foobared
 ###############################################################
 knife4j:
   enable: true
-  production: true
+  production: false
   setting:
     # 开启动态请求参数，true-开启，false-关闭
     enableDynamicParameter: true

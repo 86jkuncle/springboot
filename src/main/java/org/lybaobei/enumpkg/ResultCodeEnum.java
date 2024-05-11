@@ -17,6 +17,11 @@ public enum ResultCodeEnum {
     UNSUPPORTED_MEDIA_TYPE(415,"客户端要求的返回格式不支持"),
     UNPROCESSABLE_ENTITY(422,"客户端上传的附件无法处理"),
     TOO_MANY_REQUESTS(429,"客户端的请求次数超过限额"),
+
+    USER_LOCKED(403,"用户已被锁定,请联系管理员"),
+
+    USER_LOGOUT_SUCCESS(200,"退出成功"),
+    USER_BADCREDENTIALS(403,"用户名或密码错误"),
     INTERNAL_SERVER_ERROR(500,"客户端请求有效，服务器处理时发生了意外"),
     SERVICE_UNAVAILABLE(503,"服务器正在维护"),
     UNKNOWN_ERROR(500,"未知错误"),

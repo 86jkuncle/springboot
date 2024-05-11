@@ -27,4 +27,8 @@ public interface SysUserService extends IService<SystemUser> {
     SystemUser getByName(String userName);
     
     Map<String,Object> getUserInfo(String userId);
+
+    void incrementLockCnt(String userName);
+
+    void resetLockCnt(String userName);
 }

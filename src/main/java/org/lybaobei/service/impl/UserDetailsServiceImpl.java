@@ -4,6 +4,7 @@ import org.lybaobei.common.Constants;
 import org.lybaobei.custom.CusotmUser;
 import org.lybaobei.entity.SystemUser;
 import org.lybaobei.service.SysUserService;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,13 +31,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         if(byName.getUserStatus().equals(Constants.UserStatus.INVALID)){
-            throw new RuntimeException("用户已被删除");
+            return new CusotmUser(byName, false,true,
+                true,true,Collections.EMPTY_LIST);
         }
 
-        if(byName.getUserStatus().equals(Constants.UserStatus.LOCKED)){
-            throw new RuntimeException("用户已被锁定");
+        if(byName.getUserStatus().equals(Constants.UserStatus.LOCKED)
+            || byName.getLockCnt() == Constants.UserStatus.LOCKCNT){
+            return new CusotmUser(byName, true,true,
+                true,false,Collections.EMPTY_LIST);
         }
 
-        return new CusotmUser(byName, Collections.EMPTY_LIST);
+        return new CusotmUser(byName, true,true,
+            true,true,Collections.EMPTY_LIST);
     }
+
 }

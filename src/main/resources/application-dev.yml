@@ -21,10 +21,13 @@ spring:
 ###########################################################
   #配置jackjson
   jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
+    local-date-time-format: yyyy/MM/dd HH:mm:ss
+    local-date-format: yyyy/MM/dd
+    local-time-format: HH:mm:ss
     time-zone:
       Asia/Shanghai  #GMT+8
-###########################################################
+    date-format: yyyy-MM-dd HH:mm:ss
+  ###########################################################
 
 #
 # 配置数据源信息
@@ -56,13 +59,11 @@ spring:
     database: 0
     timeout: 1800000
     password: foobared
-    jedis:
+    lettuce:
       pool:
-        max-active: 8 #最大连接数
-        max-wait: 1000  #最大阻塞等待时间(负数没限制)
-        max-idle: 8 #最大空闲连接
-        min-idle: 0  #最小空闲连接
-        time-between-eviction-runs: -1
+        min-idle: 8
+        max-active: 20
+        max-idle: 8
 ############################################################
 #
 # mybatis-plus 配置

@@ -1,5 +1,7 @@
 package org.lybaobei.utils;
 
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
@@ -27,285 +29,501 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisUtil {
 
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String,Object> redisTemplate;
 
-//    private static RedisTemplate<String, Object> redisTemplate = SpringUtil.getBean("redisTemplate", RedisTemplate.class);
-
-    // =============== common ==========================
-    /**
-     * 指定缓存失效时间
-     * @param key 键
-     * @param time 时间(秒)
-     * @return boolean
-     */
-    public boolean expire(String key, long time) {
-        try {
-            if (time > 0) {
-                redisTemplate.expire(key, time, TimeUnit.SECONDS);
-            }
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    @Autowired
+    public RedisUtil(RedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
     }
 
     /**
-     * 根据key 获取过期时间
-     * @param key 键 不能为null
-     * @return 时间(秒) 返回0代表为永久有效 失效时间为负数，说明该主键未设置失效时间（失效时间默认为-1）
+     * 给指定的key附加过期时间
+     * @param key
+     * @param time
+     * @return
      */
-    public long getExpire(String key) {
+    public boolean expire(String key,long time){
+        return redisTemplate.expire(key, time, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 根据key获取过期时间
+     * @param key
+     * @return
+     */
+    public long getTime(String key){
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
 
     /**
-     * 判断key是否存在
+     * 检测是否存在key
+     * @param key
+     * @return
+     */
+    public boolean hasKey(String key){
+        return redisTemplate.hasKey(key);
+    }
+
+    /**
+     * 移除指定key的过期时间
+     * @param key
+     * @return
+     */
+    public boolean persist(String key){
+        return redisTemplate.boundValueOps(key).persist();
+    }
+
+    /**
+     * 根据key获取值
+     * @param key
+     * @return
+     */
+    public Object get(String key){
+        return key == null ? null :  redisTemplate.opsForValue().get(key);
+    }
+
+    /**
+     * 将值放入缓存
+     * @param key
+     * @param value
+     */
+    public void set(String key,Object value){
+        redisTemplate.opsForValue().set(key, value);
+    }
+
+    /**
+     * 将值放入缓存并设置过期时间
+     * @param key
+     * @param value
+     * @param time
+     */
+    public void set(String key,Object value,long time){
+        if(time > 0){
+            redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
+        }else{
+            set(key, value);
+        }
+    }
+
+    /**
+     * 批量添加key-value(重复的key覆盖)
+     * @param keyAndValue
+     */
+    public void batchSet(Map<String,String> keyAndValue){
+        redisTemplate.opsForValue().multiSet(keyAndValue);
+    }
+
+    /**
+     * 批量添加key-value 只有key不存在时，才添加
+     * map中只要有一个key存在,则全部不添加
+     * @param keyAndValue
+     */
+    public void batchSetIfAbsent(Map<String,String> keyAndValue){
+        redisTemplate.opsForValue().multiSetIfAbsent(keyAndValue);
+    }
+
+    /**
+     * 对一个key-value进行加减操作
+     * 如果key不存在,创建一个key并赋值 number
+     * 如果key存在,但 value 不是 long类型,将报错
+     * @param key
+     * @param number
+     * @return
+     */
+    public Long increment(String key,long number){
+        return redisTemplate.opsForValue().increment(key, number);
+    }
+
+    public Long increment(String key){
+        return redisTemplate.opsForValue().increment(key);
+    }
+
+    public Long decrement(String key){
+        return redisTemplate.opsForValue().decrement(key);
+    }
+
+    /**
+     * 对一个key-value进行加减操作
+     * 如果key不存在,创建一个key并赋值 number
+     * 如果key存在,但 value 不是 double类型,将报错
+     * @param key
+     * @param number
+     * @return
+     */
+    public Double increment(String key,double number){
+        return redisTemplate.opsForValue().increment(key, number);
+    }
+
+    /**
+     * 将数据放入set缓存
+     * @param key
+     * @param value
+     */
+    public void sSet(String key,String value){
+        redisTemplate.opsForSet().add(key, value);
+    }
+
+    /**
+     * 获取变量中的值
+     * @param key
+     * @return
+     */
+    public Set<Object> members(String key){
+        return redisTemplate.opsForSet().members(key);
+    }
+
+    /**
+     * 随机获取指定key中指定个数的元素
+     * @param key
+     * @param count
+     */
+    public void randomMembers(String key,long count){
+        redisTemplate.opsForSet().randomMembers(key, count);
+    }
+
+    /**
+     * 随机获取set中的元素
+     * @param key
+     * @return
+     */
+    public Object randomMember(String key){
+        return redisTemplate.opsForSet().randomMember(key);
+    }
+
+    /**
+     * 弹出set中的元素
+     * @param key
+     * @return
+     */
+    public Object pop(String key){
+        return redisTemplate.opsForSet().pop(key);
+    }
+
+    /**
+     * 获取set中值的长度
+     * @param key
+     * @return
+     */
+    public long size(String key){
+        return redisTemplate.opsForSet().size(key);
+    }
+
+    /**
+     * 根据value从一个set中查询,是否存在
+     *
+     * @param key   键
+     * @param value 值
+     * @return true 存在 false不存在
+     */
+    public boolean sHasKey(String key, Object value) {
+        return redisTemplate.opsForSet().isMember(key, value);
+    }
+
+    /**
+     * 检查给定的元素是否在变量中。
+     *
      * @param key 键
-     * @return true 存在 false 不存在
+     * @param obj 元素对象
+     * @return
      */
-    public boolean exists(String key){
-        try {
-            return redisTemplate.hasKey(key);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    public boolean isMember(String key, Object obj) {
+        return redisTemplate.opsForSet().isMember(key, obj);
     }
 
     /**
-     * 删除对应的value
-     * @param key string key
+     * 转移变量的元素值到目的变量。
+     *
+     * @param key     键
+     * @param value   元素对象
+     * @param destKey 元素对象
+     * @return
      */
-    public void delete(String key) {
-        if (exists(key)) {
-            redisTemplate.delete(key);
-        }
-    }
-
-    // =============== string ==========================
-    /**
-     * 写入缓存
-     * @param key string key
-     * @param value string value
-     */
-    public boolean set(String key, Object value) {
-        try {
-            redisTemplate.opsForValue().set(key, value);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    public boolean move(String key, String value, String destKey) {
+        return redisTemplate.opsForSet().move(key, value, destKey);
     }
 
     /**
-     * 写入缓存带有效期(默认时间单位:秒)
-     * @param key string key
-     * @param value string value
-     * @param expireTime Long 过期时间
-     * @return boolean
+     * 批量移除set缓存中元素
+     *
+     * @param key    键
+     * @param values 值
+     * @return
      */
-    public boolean set(String key, Object value, Long expireTime) {
-        try {
-            if (expireTime > 0) {
-                redisTemplate.opsForValue().set(key, value, expireTime, TimeUnit.SECONDS);
-            } else {
-                set(key, value);
-            }
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    public void remove(String key, Object... values) {
+        redisTemplate.opsForSet().remove(key, values);
     }
 
     /**
-     * 写入缓存带有效期
-     * @param key string key
-     * @param value string value
-     * @param expireTime Long 过期时间
-     * @param timeUnit TimeUnit 时间格式
-     * @return boolean
+     * 通过给定的key求2个set变量的差值
+     *
+     * @param key     键
+     * @param destKey 键
+     * @return
      */
-    public boolean set(String key, Object value, Long expireTime, TimeUnit timeUnit) {
-        try {
-            redisTemplate.opsForValue().set(key, value, expireTime, timeUnit);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    public Set<Object> difference(String key, String destKey) {
+        return redisTemplate.opsForSet().difference(key, destKey);
+    }
+
+
+    /**
+     * 加入缓存
+     *
+     * @param key 键
+     * @param map 键
+     * @return
+     */
+    public void add(String key, Map<String, String> map) {
+        redisTemplate.opsForHash().putAll(key, map);
     }
 
     /**
-     * 读取缓存
-     * @param key string key
-     * @return T
+     * 获取 key 下的 所有  hashkey 和 value
+     *
+     * @param key 键
+     * @return
      */
-    @SuppressWarnings("unchecked")
-    public <T> T get(String key) {
-        return (T) redisTemplate.opsForValue().get(key);
+    public Map<Object, Object> getHashEntries(String key) {
+        return redisTemplate.opsForHash().entries(key);
     }
 
     /**
-     * 哈希添加
-     * @param key string key
-     * @param hashKey Object hashKey
-     * @param value Object value
+     * 验证指定 key 下 有没有指定的 hashkey
+     *
+     * @param key
+     * @param hashKey
+     * @return
      */
-
-    public void hmSet(String key, Object hashKey, Object value) {
-        redisTemplate.opsForHash().put(key, hashKey, value);
+    public boolean hashKey(String key, String hashKey) {
+        return redisTemplate.opsForHash().hasKey(key, hashKey);
     }
 
     /**
-     * 哈希删除
-     * @param key string key
-     * @param hashKey Object hashKey
+     * 获取map缓点中指定key的值
+     * @param key
+     * @param mapKey
+     * @return
      */
-
-    public void hmDelete(String key, Object hashKey) {
-        redisTemplate.opsForHash().delete(key, hashKey);
+    public String getMapString(String key,String mapKey){
+        return redisTemplate.opsForHash().get(key,mapKey).toString();
     }
 
     /**
-     * 哈希获取数据
-     * @param key string key
-     * @param hashKey Object hashKey
+     * 获取指定的值Int
+     *
+     * @param key  键
+     * @param key2 键
+     * @return
      */
-    public Object hmGet(String key, Object hashKey) {
-        return redisTemplate.opsForHash().get(key, hashKey);
+    public Integer getMapInt(String key, String key2) {
+        return (Integer) redisTemplate.opsForHash().get("map1", "key1");
     }
 
     /**
-     * 哈希数量
-     * @param key string key
+     * 弹出元素并删除
+     *
+     * @param key 键
+     * @return
      */
-    public Long getHashSize(String key) {
+    public String popValue(String key) {
+        return redisTemplate.opsForSet().pop(key).toString();
+    }
+
+    /**
+     * 删除指定 hash 的 HashKey
+     *
+     * @param key
+     * @param hashKeys
+     * @return 删除成功的 数量
+     */
+    public Long delete(String key, String... hashKeys) {
+        return redisTemplate.opsForHash().delete(key, hashKeys);
+    }
+
+    /**
+     * 给指定 hash 的 hashkey 做增减操作
+     *
+     * @param key
+     * @param hashKey
+     * @param number
+     * @return
+     */
+    public Long increment(String key, String hashKey, long number) {
+        return redisTemplate.opsForHash().increment(key, hashKey, number);
+    }
+
+    /**
+     * 给指定 hash 的 hashkey 做增减操作
+     *
+     * @param key
+     * @param hashKey
+     * @param number
+     * @return
+     */
+    public Double increment(String key, String hashKey, Double number) {
+        return redisTemplate.opsForHash().increment(key, hashKey, number);
+    }
+
+    /**
+     * 获取 key 下的 所有 hashkey 字段
+     *
+     * @param key
+     * @return
+     */
+    public Set<Object> hashKeys(String key) {
+        return redisTemplate.opsForHash().keys(key);
+    }
+
+    /**
+     * 获取指定 hash 下面的 键值对 数量
+     *
+     * @param key
+     * @return
+     */
+    public Long hashSize(String key) {
         return redisTemplate.opsForHash().size(key);
     }
 
+
     /**
-     * 列表添加左边添加
-     * @param k string key
-     * @param v Object v
-     * @author Mr.Zhang
-     * @since 2020-04-13
+     * 在变量左边添加元素值
+     *
+     * @param key
+     * @param value
+     * @return
      */
-    public void lPush(String k, Object v) {
-        ListOperations<String, Object> list = redisTemplate.opsForList();
-        list.leftPush(k, v);
+    public void leftPush(String key, Object value) {
+        redisTemplate.opsForList().leftPush(key, value);
     }
 
     /**
-     * 列表添加左边添加
-     * @param k string key
-     * @param v Object v
-     * @author Mr.Zhang
-     * @since 2020-04-13
+     * 获取集合指定位置的值。
+     *
+     * @param key
+     * @param index
+     * @return
      */
-    public void lDele(String k, Object v) {
-        redisTemplate.opsForList().remove(k, 1, v);
-    }
-    /**
-     * 从右边拿出来一个
-     * @param k string key
-     * @param t Long 超时秒数
-     */
-    public Object getRightPop(String k, Long t){
-        return redisTemplate.opsForList().rightPop(k, t, TimeUnit.SECONDS);
+    public Object index(String key, long index) {
+        return redisTemplate.opsForList().index(key, index);
     }
 
     /**
-     * 列表获取数量
-     * @param k string key
-     * @return Long
+     * 获取指定区间的值。
+     *
+     * @param key
+     * @param start
+     * @param end
+     * @return
      */
-    public Long getListSize(String k) {
-        return redisTemplate.opsForList().size(k);
+    public List<Object> range(String key, long start, long end) {
+        return redisTemplate.opsForList().range(key, start, end);
     }
 
     /**
-     * 列表获取
-     * @param k string key
-     * @param l long l
-     * @param l1 long l1
-     * @return List<Object>
+     * 把最后一个参数值放到指定集合的第一个出现中间参数的前面，
+     * 如果中间参数值存在的话。
+     *
+     * @param key
+     * @param pivot
+     * @param value
+     * @return
      */
-    public List<Object> lRange(String k, long l, long l1) {
-        ListOperations<String, Object> list = redisTemplate.opsForList();
-        return list.range(k, l, l1);
+    public void leftPush(String key, String pivot, String value) {
+        redisTemplate.opsForList().leftPush(key, pivot, value);
     }
 
     /**
-     * 集合添加
-     * @param key string key
-     * @param value Object value
+     * 向左边批量添加参数元素。
+     *
+     * @param key
+     * @param values
+     * @return
      */
-    public void add(String key, Object value) {
-        SetOperations<String, Object> set = redisTemplate.opsForSet();
-        set.add(key, value);
+    public void leftPushAll(String key, String... values) {
+//        redisTemplate.opsForList().leftPushAll(key,"w","x","y");
+        redisTemplate.opsForList().leftPushAll(key, values);
     }
 
     /**
-     * 集合获取
-     * @param key string key
-     * @return Set<Object>
+     * 向集合最右边添加元素。
+     *
+     * @param key
+     * @param value
+     * @return
      */
-    public Set<Object> setMembers(String key) {
-        SetOperations<String, Object> set = redisTemplate.opsForSet();
-        return set.members(key);
+    public void leftPushAll(String key, String value) {
+        redisTemplate.opsForList().rightPush(key, value);
     }
 
     /**
-     * 有序集合添加    排行榜使用
-     * @param key string key
-     * @param value Object value
-     * @param score double scoure
+     * 向左边批量添加参数元素。
+     *
+     * @param key
+     * @param values
+     * @return
      */
-    public void zAdd(String key, Object value, double score) {
-        ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
-        zset.add(key, value, score);
-    }
-
-
-    /**
-     * 有序集合获取    排行榜使用
-     * @param key string key
-     * @param score double scoure
-     * @return Set<Object>
-     */
-    public Set<Object> rangeByScore(String key, double score, double score1) {
-        ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
-        return zset.rangeByScore(key, score, score1);
+    public void rightPushAll(String key, String... values) {
+        //redisTemplate.opsForList().leftPushAll(key,"w","x","y");
+        redisTemplate.opsForList().rightPushAll(key, values);
     }
 
     /**
-     * 递增
-     * @param key 键
-     * @return long
+     * 向已存在的集合中添加元素。
+     *
+     * @param key
+     * @param value
+     * @return
      */
-    public long incrAndCreate(String key){
-        if (!exists(key)) {
-            set(key, 1);
-            return 1;
-        }
-        return incr(key, 1L);
+    public void rightPushIfPresent(String key, Object value) {
+        redisTemplate.opsForList().rightPushIfPresent(key, value);
     }
 
     /**
-     * 递增
-     * @param key 键
-     * @param delta 要增加几(大于0)
-     * @return long
+     * 向已存在的集合中添加元素。
+     *
+     * @param key
+     * @return
      */
-    public long incr(String key, long delta){
-        if (delta < 0) {
-            throw new RuntimeException("递增因子必须大于0");
-        }
-        return redisTemplate.opsForValue().increment(key, delta);
+    public long listLength(String key) {
+        return redisTemplate.opsForList().size(key);
     }
 
+    /**
+     * 移除集合中的左边第一个元素。
+     *
+     * @param key
+     * @return
+     */
+    public void leftPop(String key) {
+        redisTemplate.opsForList().leftPop(key);
+    }
+
+    /**
+     * 移除集合中左边的元素在等待的时间里，如果超过等待的时间仍没有元素则退出。
+     *
+     * @param key
+     * @return
+     */
+    public void leftPop(String key, long timeout, TimeUnit unit) {
+        redisTemplate.opsForList().leftPop(key, timeout, unit);
+    }
+
+    /**
+     * 移除集合中右边的元素。
+     *
+     * @param key
+     * @return
+     */
+    public void rightPop(String key) {
+        redisTemplate.opsForList().rightPop(key);
+    }
+
+    /**
+     * 移除集合中右边的元素在等待的时间里，如果超过等待的时间仍没有元素则退出。
+     *
+     * @param key
+     * @return
+     */
+    public void rightPop(String key, long timeout, TimeUnit unit) {
+        redisTemplate.opsForList().rightPop(key, timeout, unit);
+    }
 }

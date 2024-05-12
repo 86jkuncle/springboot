@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.lybaobei.common.Constants;
 import org.lybaobei.enumpkg.ResultCodeEnum;
 import org.lybaobei.utils.JWTUtil;
+import org.lybaobei.utils.RedisUtil;
 import org.lybaobei.utils.ResponseUtil;
 import org.lybaobei.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +34,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
 
     private ObjectMapper objectMapper = new ObjectMapper();
-    private RedisTemplate redisTemplate;
-    public TokenAuthenticationFilter(RedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
+    private RedisUtil redisUtil;
+    public TokenAuthenticationFilter(RedisUtil redisUtil) {
+        this.redisUtil = redisUtil;
     }
 
     private static final Set<String> allUrls =
@@ -69,11 +70,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             String userName = JWTUtil.getUserName(token);
             if(!StringUtils.isEmpty(userName)){
                 List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                if(!redisTemplate.hasKey(Constants.RedisKey.USER_PERMISSION_KEY+JWTUtil.getUserId(token))){
+                if(!redisUtil.hasKey(Constants.RedisKey.USER_PERMISSION_KEY+JWTUtil.getUserId(token))){
                     return new UsernamePasswordAuthenticationToken(userName,null, authorities);
                 }
-                String authoritiesString = (String) redisTemplate.opsForValue()
-                        .get(Constants.RedisKey.USER_PERMISSION_KEY+JWTUtil.getUserId(token));
+                String authoritiesString = (String) redisUtil.get(Constants.RedisKey.USER_PERMISSION_KEY+JWTUtil.getUserId(token));
 
                 List<Map<String,String>> map =
                     Collections.singletonList(objectMapper.convertValue(authoritiesString,

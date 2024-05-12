@@ -11,6 +11,7 @@ import org.lybaobei.custom.MyLogOutSuccessHandler;
 import org.lybaobei.filter.CustomAuthenticationProvider;
 import org.lybaobei.filter.TokenAuthenticationFilter;
 import org.lybaobei.filter.TokenLoginFilter;
+import org.lybaobei.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private CustomAuthenticationProvider customAuthenticationProvider;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisUtil redisUtil;
 
     @Autowired
     private MyLogOutSuccessHandler logoutHandler;
@@ -72,8 +73,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 //TokenAuthenticationFilter放到UsernamePasswordAuthenticationFilter的前面，
                 // 这样做就是为了除了登录的时候去查询数据库外，其他时候都用token进行认证。
-                .addFilterBefore(new TokenAuthenticationFilter(redisTemplate), UsernamePasswordAuthenticationFilter.class)
-                .addFilter(new TokenLoginFilter(authenticationManager(),redisTemplate))
+                .addFilterBefore(new TokenAuthenticationFilter(redisUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilter(new TokenLoginFilter(authenticationManager(),redisUtil))
                     .logout().logoutUrl("/admin/system/user/logout").
             logoutSuccessHandler(logoutHandler)
             .permitAll();

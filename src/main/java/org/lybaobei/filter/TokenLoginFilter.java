@@ -12,6 +12,7 @@ import org.lybaobei.dto.LoginDTO;
 import org.lybaobei.entity.SystemUser;
 import org.lybaobei.enumpkg.ResultCodeEnum;
 import org.lybaobei.utils.JWTUtil;
+import org.lybaobei.utils.RedisUtil;
 import org.lybaobei.utils.ResponseUtil;
 import org.lybaobei.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,16 +44,16 @@ import java.util.Map;
 public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
 
 
-    private RedisTemplate redisTemplate;
+    private RedisUtil redisUtil;
 
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public TokenLoginFilter(AuthenticationManager authenticationManager,RedisTemplate redisTemplate){
+    public TokenLoginFilter(AuthenticationManager authenticationManager,RedisUtil redisUtil){
         this.setAuthenticationManager(authenticationManager);
         this.setPostOnly(true);
         this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/admin/system/user/login","POST"));
-        this.redisTemplate = redisTemplate;
+        this.redisUtil = redisUtil;
     }
 
     @SneakyThrows
@@ -73,12 +74,11 @@ public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
         String userId = user.getUserId();
 
         if(!cusotmUser.getAuthorities().isEmpty()){
-            redisTemplate.opsForValue().set(Constants.RedisKey.USER_PERMISSION_KEY +userId
+            redisUtil.set(Constants.RedisKey.USER_PERMISSION_KEY +userId
                 ,objectMapper.writeValueAsString(cusotmUser.getAuthorities()));
         }
 
         String token = JWTUtil.createToken(userId, user.getUserName());
-        System.out.println(token);
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("token",token);
         ResponseUtil.out(response, Result.success(resultMap));

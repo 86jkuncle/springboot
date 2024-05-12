@@ -1,7 +1,12 @@
 package org.lybaobei.filter;
 
+import cn.hutool.core.stream.CollectorUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import java.util.Collections;
+import javax.annotation.Resource;
 import lombok.SneakyThrows;
+import org.lybaobei.common.Constants;
 import org.lybaobei.custom.CusotmUser;
 import org.lybaobei.dto.LoginDTO;
 import org.lybaobei.entity.SystemUser;
@@ -9,6 +14,8 @@ import org.lybaobei.enumpkg.ResultCodeEnum;
 import org.lybaobei.utils.JWTUtil;
 import org.lybaobei.utils.ResponseUtil;
 import org.lybaobei.vo.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -36,11 +43,16 @@ import java.util.Map;
 public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
 
 
+    private RedisTemplate redisTemplate;
 
-    public TokenLoginFilter(AuthenticationManager authenticationManager){
+
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    public TokenLoginFilter(AuthenticationManager authenticationManager,RedisTemplate redisTemplate){
         this.setAuthenticationManager(authenticationManager);
         this.setPostOnly(true);
         this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/admin/system/user/login","POST"));
+        this.redisTemplate = redisTemplate;
     }
 
     @SneakyThrows
@@ -58,8 +70,14 @@ public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
                                             Authentication authResult) throws IOException, ServletException {
         CusotmUser cusotmUser = (CusotmUser) authResult.getPrincipal();
         SystemUser user = cusotmUser.getSystemUser();
+        String userId = user.getUserId();
 
-        String token = JWTUtil.createToken(user.getUserId(), user.getUserName());
+        if(!cusotmUser.getAuthorities().isEmpty()){
+            redisTemplate.opsForValue().set(Constants.RedisKey.USER_PERMISSION_KEY +userId
+                ,objectMapper.writeValueAsString(cusotmUser.getAuthorities()));
+        }
+
+        String token = JWTUtil.createToken(userId, user.getUserName());
         System.out.println(token);
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("token",token);

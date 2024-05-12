@@ -3,6 +3,7 @@ package org.lybaobei.api;
 import com.github.xiaoymin.knife4j.annotations.ApiSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.lybaobei.common.Constants;
 import org.lybaobei.dto.LoginDTO;
 import org.lybaobei.entity.SystemUser;
@@ -46,7 +47,7 @@ public class LoginController {
 //        if(StringUtils.isBlank(token)){
 //            throw new APIException("用户未登录");
 //        }
-
+//
 //        String userId = JWTUtil.getUserId(token);
 //        Map<String,Object> resultMap = sysUserService.getUserInfo(userId);
         Map<String,Object> resultMap = new HashMap<>();

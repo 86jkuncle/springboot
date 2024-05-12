@@ -7,6 +7,7 @@ import org.lybaobei.dto.PageDTO;
 import org.lybaobei.entity.SystemMenu;
 import org.lybaobei.service.SysMenuService;
 import org.lybaobei.vo.Result;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -23,7 +24,8 @@ public class SysMenuController {
     
     @Resource
     private SysMenuService sysMenuService;
-    
+
+    @PostAuthorize("hasAuthority('btn:sysMenu:list')")
     @ApiOperation("获得所有菜单")
     @GetMapping("/listAll")
     public Result listAll(){

@@ -1,7 +1,9 @@
 package org.lybaobei.expHandler;
 
+import org.lybaobei.enumpkg.ResultCodeEnum;
 import org.lybaobei.exception.APIException;
 import org.lybaobei.vo.Result;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -18,6 +20,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(APIException.class)
     public Result error(APIException e){
         return Result.fail(e.getStatus(),e.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public Result error(AccessDeniedException e){
+        return Result.fail(ResultCodeEnum.FORBIDDEN);
     }
 
     @ExceptionHandler(Exception.class)

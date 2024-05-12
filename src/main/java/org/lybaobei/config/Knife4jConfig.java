@@ -2,9 +2,13 @@ package org.lybaobei.config;
 
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import springfox.documentation.RequestHandler;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -24,7 +28,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EnableWebMvc
 public class Knife4jConfig {
-    
+
+    /**
+     * 定义分隔符
+     */
+    private static final String SPLITOR = ";";
     @Bean
     public Docket adminApiConfig(){
         
@@ -34,7 +42,8 @@ public class Knife4jConfig {
                 .apiInfo(adminApiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("org.lybaobei.api"))
-                .paths(PathSelectors.regex("/admin/.*"))
+//                .paths(PathSelectors.regex("/admin/.*"))
+            .paths(PathSelectors.any())
                 .build();
         return adminApi;
     }
@@ -48,6 +57,48 @@ public class Knife4jConfig {
                 .build();
         
     }
+
+
+    /**
+     * @author luoyu
+     * @description 重写basePackage方法，使能够实现多包访问
+     * @param basePackage 所有包路径
+     * @return Predicate<RequestHandler>
+     */
+    public static Predicate<RequestHandler> basePackage(final String basePackage) {
+        return input -> declaringClass(input).map(handlerPackage(basePackage)::apply).orElse(true);
+    }
+
+    /**
+     * @author luoyu
+     * @description 重写basePackage方法，使能够实现多包访问
+     * @param basePackage 所有包路径
+     * @return Function<Class<?>, Boolean>
+     */
+    private static Function<Class<?>, Boolean> handlerPackage(final String basePackage)     {
+        return input -> {
+            // 循环判断匹配
+            for (String strPackage : basePackage.split(SPLITOR)) {
+                assert input != null;
+                boolean isMatch = input.getPackage().getName().startsWith(strPackage);
+                if (isMatch) {
+                    return true;
+                }
+            }
+            return false;
+        };
+    }
+
+    /**
+     * @author luoyu
+     * @description 重写basePackage方法，使能够实现多包访问
+     * @param input
+     * @return Optional<? extends Class<?>>
+     */
+    private static Optional<Class<?>> declaringClass(RequestHandler input) {
+        return Optional.ofNullable(input.declaringClass());
+    }
+
     
 }
 

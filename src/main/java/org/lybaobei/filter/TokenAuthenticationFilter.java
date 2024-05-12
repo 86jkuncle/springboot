@@ -1,13 +1,19 @@
 package org.lybaobei.filter;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
+import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.lybaobei.common.Constants;
 import org.lybaobei.enumpkg.ResultCodeEnum;
 import org.lybaobei.utils.JWTUtil;
 import org.lybaobei.utils.ResponseUtil;
 import org.lybaobei.vo.Result;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,7 +31,11 @@ import java.util.*;
 
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
-    public TokenAuthenticationFilter() {
+
+    private ObjectMapper objectMapper = new ObjectMapper();
+    private RedisTemplate redisTemplate;
+    public TokenAuthenticationFilter(RedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
     }
 
     private static final Set<String> allUrls =
@@ -58,7 +68,21 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         if(!StringUtils.isEmpty(token)){
             String userName = JWTUtil.getUserName(token);
             if(!StringUtils.isEmpty(userName)){
-                return new UsernamePasswordAuthenticationToken(userName,null, Collections.emptyList());
+                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                if(!redisTemplate.hasKey(Constants.RedisKey.USER_PERMISSION_KEY+JWTUtil.getUserId(token))){
+                    return new UsernamePasswordAuthenticationToken(userName,null, authorities);
+                }
+                String authoritiesString = (String) redisTemplate.opsForValue()
+                        .get(Constants.RedisKey.USER_PERMISSION_KEY+JWTUtil.getUserId(token));
+
+                List<Map<String,String>> map =
+                    Collections.singletonList(objectMapper.convertValue(authoritiesString,
+                        Map.class));
+
+                map.forEach(entry->{
+                    authorities.add(new SimpleGrantedAuthority(entry.get("authority")));
+                });
+                return new UsernamePasswordAuthenticationToken(userName,null, authorities);
             }
         }
         return null;

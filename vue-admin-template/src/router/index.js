@@ -39,11 +39,11 @@ export const constantRoutes = [
     hidden: true
   },
 
-  {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
-  },
+  // {
+  //   path: '/404',
+  //   component: () => import('@/views/404'),
+  //   hidden: true
+  // },
 
   {
     path: '/',
@@ -57,51 +57,51 @@ export const constantRoutes = [
     }]
   },
 
-  {
-    path: '/system',
-    component: Layout,
-    redirect: '/system/sysUser',
-    name: 'System',
-    meta: { title: '系统管理', icon: 'el-icon-s-help' },
-    children: [
-      {
-        path: 'sysRole',
-        name: 'SysRole',
-        component: () => import('@/views/system/sysrole'),
-        meta: { title: '角色管理', icon: 'table' }
-      },
-      {
-        path: 'sysUser',
-        name: 'SysUser',
-        component: () => import('@/views/system/sysuser'),
-        meta: { title: '用户管理', icon: 'tree' }
-      },
-      {
-        path: 'sysMenu',
-        name: 'SysMenu',
-        component: () => import('@/views/system/sysmenu'),
-        meta: { title: '菜单管理', icon: 'tree' }
-      },
-      {
-        path: 'sysOrg',
-        name: 'SysOrg',
-        component: () => import('@/views/system/sysorg'),
-        meta: { title: '机构管理', icon: 'tree' }
-      },
-      {
-        path:'assignAuth',
-        component: () => import('@/views/system/sysrole/assignAuth'),
-        meta:{
-          activeMenu:'/system/sysRole',
-          title:'角色授权'
-        },
-        hidden:true,
-      },
-    ]
-  },
+  //  {
+  //   path: '/system',
+  //   component: Layout,
+  //   redirect: '/system/sysUser',
+  //   name: 'System',
+  //   meta: { title: '系统管理', icon: 'el-icon-s-help' },
+  //   children: [
+  //     {
+  //       path: 'sysRole',
+  //       name: 'SysRole',
+  //       component: () => import('@/views/system/sysrole'),
+  //       meta: { title: '角色管理', icon: 'table' }
+  //     },
+  //     {
+  //       path: 'sysUser',
+  //       name: 'SysUser',
+  //       component: () => import('@/views/system/sysuser'),
+  //       meta: { title: '用户管理', icon: 'tree' }
+  //     },
+  //     {
+  //       path: 'sysMenu',
+  //       name: 'SysMenu',
+  //       component: () => import('@/views/system/sysmenu'),
+  //       meta: { title: '菜单管理', icon: 'tree' }
+  //     },
+  //     {
+  //       path: 'sysOrg',
+  //       name: 'SysOrg',
+  //       component: () => import('@/views/system/sysorg'),
+  //       meta: { title: '机构管理', icon: 'tree' }
+  //     },
+  //     {
+  //       path:'assignAuth',
+  //       component: () => import('@/views/system/sysrole/assignAuth'),
+  //       meta:{
+  //         activeMenu:'/system/sysRole',
+  //         title:'角色授权'
+  //       },
+  //       hidden:true,
+  //     },
+  //   ]
+  // },
   
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  // // 404 page must be placed at the end !!!
+  // { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({

@@ -1,10 +1,15 @@
 package org.lybaobei.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.lybaobei.common.Constants;
 import org.lybaobei.custom.CusotmUser;
 import org.lybaobei.entity.SystemUser;
+import org.lybaobei.service.SysMenuService;
 import org.lybaobei.service.SysUserService;
+import org.lybaobei.vo.RouterVO;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,27 +27,40 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Resource
     private SysUserService sysUserService;
+
+    @Resource
+    private SysMenuService menuService;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        SystemUser byName = sysUserService.getByName(username);
+        SystemUser loginUser = sysUserService.getByName(username);
 
-        if(byName == null){
+        if(loginUser == null){
             throw new UsernameNotFoundException("用户不存在");
         }
 
-        if(byName.getUserStatus().equals(Constants.UserStatus.INVALID)){
-            return new CusotmUser(byName, false,true,
+        if(loginUser.getUserStatus().equals(Constants.UserStatus.INVALID)){
+            return new CusotmUser(loginUser, false,true,
                 true,true,Collections.EMPTY_LIST);
         }
 
-        if(byName.getUserStatus().equals(Constants.UserStatus.LOCKED)
-            || byName.getLockCnt() == Constants.UserStatus.LOCKCNT){
-            return new CusotmUser(byName, true,true,
+        if(loginUser.getUserStatus().equals(Constants.UserStatus.LOCKED)
+            || loginUser.getLockCnt() == Constants.UserStatus.LOCKCNT){
+            return new CusotmUser(loginUser, true,true,
                 true,false,Collections.EMPTY_LIST);
         }
 
-        return new CusotmUser(byName, true,true,
-            true,true,Collections.EMPTY_LIST);
+        //根据用户id查询用户按钮权限
+        List<String> userButtonPermsList =
+            menuService.getUserButtonPermsList(loginUser.getUserId());
+
+        //转换成security要求的格式
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+        userButtonPermsList.forEach(item->{
+            authorities.add(new SimpleGrantedAuthority(item));
+        });
+        return new CusotmUser(loginUser, true,true,
+            true,true,authorities);
     }
 
 }

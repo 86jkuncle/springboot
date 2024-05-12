@@ -38,4 +38,8 @@ public class Constants {
         static final int MENUED = 2;
         static final int BUTTONS = 3;
     }
+
+    public interface RedisKey {
+        static final String USER_PERMISSION_KEY = "USER_PERMISSION_KEY:";
+    }
 }

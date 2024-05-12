@@ -23,7 +23,7 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone:
-      Asia/Shanghai
+      Asia/Shanghai  #GMT+8
 ###########################################################
 
 #
@@ -33,7 +33,7 @@ spring:
   datasource: # 数据源的相关配置
     type: com.zaxxer.hikari.HikariDataSource # 数据源类型：HikariCP
     driver-class-name: com.mysql.jdbc.Driver # mysql驱动
-    url: jdbc:mysql://localhost:3306/hntt?useUnicode=true&characterEncoding=UTF-8&autoReconnect&useSSL=false
+    url: jdbc:mysql://localhost:3306/hntt?useUnicode=true&characterEncoding=UTF-8&autoReconnect&useSSL=false&autoReconnect=true
     username: root
     password: 123456
     hikari:
@@ -45,6 +45,24 @@ spring:
       pool-name: DateSourceHikariCP # 连接池名字
       max-lifetime: 1800000 # 连接的生命时长（毫秒），超时而且没被使用则被释放（retired），默认:30分钟
       connection-test-query: SELECT 1
+############################################################
+#
+# redis 配置
+#
+############################################################
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    timeout: 1800000
+    password: foobared
+    jedis:
+      pool:
+        max-active: 8 #最大连接数
+        max-wait: 1000  #最大阻塞等待时间(负数没限制)
+        max-idle: 8 #最大空闲连接
+        min-idle: 0  #最小空闲连接
+        time-between-eviction-runs: -1
 ############################################################
 #
 # mybatis-plus 配置
@@ -68,7 +86,7 @@ logging:
   config: classpath:logback-spring.xml
 ############################################################
 #
-# 自定义 配置
+# 自定义 配置 redission
 #
 ############################################################
 ms:

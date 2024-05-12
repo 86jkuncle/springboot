@@ -34,6 +34,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
 
     private ObjectMapper objectMapper = new ObjectMapper();
+
     private RedisUtil redisUtil;
     public TokenAuthenticationFilter(RedisUtil redisUtil) {
         this.redisUtil = redisUtil;

@@ -44,16 +44,16 @@ import java.util.Map;
 public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
 
 
+    @Autowired
     private RedisUtil redisUtil;
 
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public TokenLoginFilter(AuthenticationManager authenticationManager,RedisUtil redisUtil){
+    public TokenLoginFilter(AuthenticationManager authenticationManager){
         this.setAuthenticationManager(authenticationManager);
         this.setPostOnly(true);
         this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/admin/system/user/login","POST"));
-        this.redisUtil = redisUtil;
     }
 
     @SneakyThrows

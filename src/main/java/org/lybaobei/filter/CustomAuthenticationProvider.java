@@ -28,11 +28,14 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
     @Autowired
     private SysUserService userService;
+
+
     @Autowired
     @Override
     public void setUserDetailsService(UserDetailsService userDetailsService) {
         super.setUserDetailsService(userDetailsService);
     }
+
 
     @Autowired
     @Override
